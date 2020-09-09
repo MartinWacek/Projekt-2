@@ -1,0 +1,148 @@
+# Souhrnné
+import random
+
+print(50 * "=")
+print(
+    "Welcome to Tic Tac Toe\nGAME RULES:\nEach player can place one mark (or stone) per turn on the 3x3 grid\nThe WINNER is who succeeds in placing three of their marks in a\n* horizontal,\n* vertical or\n* diagonal row\nLet's start the game")
+size = int(input('Please enter the board size:'))
+
+
+# 1) Pripraveni hry
+def setup_game():
+    board = []
+    if size > 1:
+        for row in range(size):
+            board.append([' '] * size)
+
+        losovac = random.choice(['X', 'O'])
+        #print(losovac)
+        return board, losovac
+    else:
+        print("Too small board.")
+
+# 2) Tisk hraci plochy
+def print_board(board):
+    plocha = []
+    size = len(board)
+    plocha.append("\n" + "_" * size * 2 + "\n")
+
+    # radek
+    for row in board:
+        plocha.append('|'.join(row) + '\n')
+        plocha.append('_' * size * 2 + '\n')
+
+    print(''.join(plocha))
+
+
+# 4) Tah
+def make_move(player, board):
+    while True:
+
+        move = int(input("Player {} | Please enter your move number:".format(player)))
+
+        row, col = to_coord(move, len(board))
+
+        if board[row][col] == ' ':
+
+            board[row][col] = player
+            break
+
+        else:
+            print("This position is already taken\n")
+
+    return board
+
+
+# 5) Pomocna funkce pro tah
+def to_coord(scalar_pos, size):
+    column = (scalar_pos - 1) % size
+    row = round((scalar_pos - column) // size)
+    return row, column
+
+
+# 6) Tah druheho hrace
+def swap_players (player):
+    return "X" if player == "O" else "O"
+
+
+# 7) Ukonceni hry - Vyhra/Prohra
+
+
+
+# Funkci check_game_over přiznávám, že jsem opsal. Na tuto úvahu mi nestačila kapacita myšlení.
+def check_game_over(board, player):
+    # Velikost hraci plochy
+    size = len(board)
+
+    # Prevod na 1-dimensionalni list
+    flat_board = flatten(board)
+
+    # Prochazime kazdou radu
+    for i in range(size):
+
+        # Kontrola radku a sloupcu
+        if set(flat_board[i * size:i * size + size]) == set(player) \
+                or set(flat_board[i:size ** 2:size]) == set(player):
+            return True  # row & column
+
+        # Kontrola diagonaly zleva dolu
+        if i == 0 and set(flat_board[i:size ** 2:size + 1]) == set(player):
+            return True
+
+        # Kontrola diagonaly zprava dolu
+        elif i == size - 1 and set(flat_board[i:size ** 2 - 1:size - 1]) == set(player):
+            return True
+
+
+# 8) Pomocna funkce pro ukonceni hry
+def flatten(board):
+    t = []
+    for c in board:
+        t = t + c
+    return t
+
+
+# 9) Funkce pro tisk vyherce
+def print_game_over(player):
+    print(50 * "=", "\n")
+    print("Congratulations, the player {} WON!".format(player))
+
+
+# 10) Remiza
+def board_full(board):
+    return ' ' not in flatten(board)
+
+
+# 11) Funkce pro tisk remízy
+def print_tie():
+    print(50 * "=", "\n")
+    print("Nobody wins, this is a tie")
+
+
+# Final
+def main():
+    board, player = setup_game()
+
+    while True:
+
+        print_board(board)
+
+        board = make_move(player, board)
+
+        if check_game_over(board, player):
+
+            print_game_over(player)
+
+            break
+
+        elif board_full(board):
+
+            print_tie()
+            break
+
+        player = swap_players(player)
+
+    print_board(board)
+
+if __name__ == '__main__':
+    main()
